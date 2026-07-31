@@ -87,7 +87,7 @@ syntax region typstExprCodeBlock
 syntax region typstExprContentBlock
       \ contained
       \ extend
-      \ contains=@typstMarkup,typstExprStart,typstMarkupMath
+      \ contains=@typstMarkup,typstExprStart,typstMarkupMath,@typstComment
       \ nextgroup=@typstExpr
       \ matchgroup=NONE
       \ start=/\[/
@@ -102,7 +102,7 @@ syntax match typstExprFunc
       \ skipwhite
       \ contained
       \ contains=typstExprDot
-      \ nextgroup=typstExprBraces,typstExprContentBlock,@typstExpr
+      \ nextgroup=typstExprBraces,typstExprContentBlock,@typstExpr,@typstComment
       \ /\k\+\%(\.\k\+\)*[[(]\@=/
 
 syntax cluster typstExprConstants
@@ -117,6 +117,7 @@ syntax match typstExprConstant
 
 syntax region typstExprString
       \ contained
+      \ nextgroup=typstExprCommand,typstExprColon,typstExprDot,typstExprOp,typstExprOpSym
       \ start=/"/ skip=/\v\\\\|\\"/ end=/"/
       \ contains=@Spell
 syntax match typstExprNumber
