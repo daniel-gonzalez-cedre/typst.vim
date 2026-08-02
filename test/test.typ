@@ -9,4 +9,11 @@
 henlo #emph[hello] world
 #grid[a][b] trailing
 #foo bar
-henlo #dict.key rest rest rest
+
+this is #my-identifier and not yours
+this is #my-func() and not yours
+
+Lorem #dict.key ipsum dolor sit amet
+Lorem #obj.method("ipsum") dolor sit amet
+
+Lorem #emph("ipsum") and dolor sit amet
