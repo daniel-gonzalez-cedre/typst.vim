@@ -30,7 +30,26 @@ syntax cluster typstExpr
       \ ,typstExprOp
       \ ,@typstComment
 
+" The '#' that introduces a code expression is colored to match
+" whatever it's tagging, so it reads as part of that token rather
+" than a separate marker. Each variant below only differs in its
+" lookahead and highlight link; every one still hands off parsing
+" to the same bare-interpolation chain via nextgroup.
 syntax match typstExprStart /#/ nextgroup=@typstExprBare
+syntax match typstExprStartVar /#\ze[[:alpha:]_]/ nextgroup=@typstExprBare
+syntax match typstExprStartNumber /#\ze-\=\d/ nextgroup=@typstExprBare
+syntax match typstExprStartString /#\ze"/ nextgroup=@typstExprBare
+syntax match typstExprStartLabel /#\ze</ nextgroup=@typstExprBare
+syntax match typstExprStartCode /#\ze{/ nextgroup=@typstExprBare
+syntax match typstExprStartContent /#\ze\[/ nextgroup=@typstExprBare
+syntax match typstExprStartBraces /#\ze(/ nextgroup=@typstExprBare
+syntax match typstExprStartConstant
+      \ /#\ze\%(none\|auto\|true\|false\)\>/
+      \ nextgroup=@typstExprBare
+syntax match typstExprStartCommand
+      \ /#\ze\%(let\|set\|while\|for\|if\|else\|show\|import\|include\|context\|return\)\>/
+      \ nextgroup=@typstExprBare
+syntax match typstExprStartFunc /#\ze\k\+\%(\.\k\+\)*[[(]/ nextgroup=@typstExprBare
 syntax match typstExprDot /\./
       \ contained
       \ nextgroup=typstExprField
@@ -422,6 +441,13 @@ hi def link typstMathNumber Number
 hi def link typstMathSymbol Statement
 
 hi def link typstExprStart Special
+hi def link typstExprStartVar Identifier
+hi def link typstExprStartNumber Number
+hi def link typstExprStartString String
+hi def link typstExprStartLabel Structure
+hi def link typstExprStartConstant Constant
+hi def link typstExprStartCommand Statement
+hi def link typstExprStartFunc Function
 hi def link typstExprOp Statement
 hi def link typstExprVar Identifier
 hi def link typstExprBareVar Identifier
@@ -459,7 +485,7 @@ hi def link typstMarkupEllipsis Special
 hi def link typstMarkupTermList Bold
 hi def link typstMarkupTermListDelimiter PreProc
 hi def link typstMarkupHeading Title
-hi def link typstMarkupHeadingDelimiter Type
+hi def link typstMarkupHeadingDelimiter Title
 hi def link typstMarkupUrl Underlined
 hi def link typstMarkupBold Bold
 hi def link typstMarkupItalic Italic

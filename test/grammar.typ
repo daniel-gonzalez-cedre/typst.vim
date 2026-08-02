@@ -17,6 +17,8 @@
 }
 #let w = foo(1 + 2, a and b)
 
+#foo((name: "bar"), 1 - (-12.0))
+
 $
 alpha + x + 1 = y
 $
