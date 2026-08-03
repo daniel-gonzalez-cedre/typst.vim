@@ -287,6 +287,7 @@ syntax cluster typstMarkup
       \ ,typstMarkupEllipsis
       \ ,typstMarkupBackslash
       \ ,typstMarkupEscape
+      \ ,@typstComment
 
 syntax region typstMarkupRawInline
       \ matchgroup=typstMarkupRawDelimiter
