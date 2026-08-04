@@ -22,3 +22,19 @@
 $
 alpha + x + 1 = y
 $
+
+#import "@local/thing:0.0.1": note, notefigure, wideblock
+
+#box[
+  A fragment taken from the #link("https://example.com/x")[_source_], dated #circa
+  100 #AD, more text.
+  // #angle(commented.out.expr) should not highlight
+]
+
+#box[
+  Erd#(diacritic.acute.double)[o]s
+]
+
+#let even(x) = $#x$ + " is even"
+
+Some text $x+y$ more text after, not code.

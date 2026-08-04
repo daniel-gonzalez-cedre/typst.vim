@@ -28,6 +28,7 @@ syntax cluster typstExpr
       \ ,typstExprVar
       \ ,typstExprOpSym
       \ ,typstExprOp
+      \ ,typstExprMath
       \ ,@typstComment
 
 " The '#' that introduces a code expression is colored to match
@@ -50,6 +51,24 @@ syntax match typstExprStartCommand
       \ /#\ze\%(let\|set\|while\|for\|if\|else\|show\|import\|include\|context\|return\)\>/
       \ nextgroup=@typstExprBare
 syntax match typstExprStartFunc /#\ze\k\+\%(\.\k\+\)*[[(]/ nextgroup=@typstExprBare
+
+" Wherever markup needs "the '#' that starts an embedded expression",
+" it must reach the whole family above, not just the generic fallback
+" -- otherwise hashtag context-coloring silently reverts to plain
+" Special the moment you're nested inside a content block.
+syntax cluster typstExprStartAll
+      \ contains=typstExprStart
+      \ ,typstExprStartVar
+      \ ,typstExprStartNumber
+      \ ,typstExprStartString
+      \ ,typstExprStartLabel
+      \ ,typstExprStartCode
+      \ ,typstExprStartContent
+      \ ,typstExprStartBraces
+      \ ,typstExprStartConstant
+      \ ,typstExprStartCommand
+      \ ,typstExprStartFunc
+
 syntax match typstExprDot /\./
       \ contained
       \ nextgroup=typstExprField
@@ -87,7 +106,7 @@ syntax match typstExprField /\k\+/
 syntax region typstExprBraces
       \ skipwhite
       \ contained
-      \ contains=@typstExpr,typstMarkupMath
+      \ contains=@typstExpr
       \ nextgroup=typstExprOp,typstExprOpSym,@typstExpr
       \ start=/(/
       \ end=/)/
@@ -97,7 +116,7 @@ syntax match typstExprOpSym /\%(=[=>]\)\|\%([-+*/<>!=]=\)\|[<=>\-+*/]/
       \ contained
       \ nextgroup=typstExprFunc,@typstExpr
 
-syntax match typstExprOp /in\>\|and\>\|or\>\|\%(not\%(\s\+in\>\)\?\)/
+syntax match typstExprOp /\<in\>\|\<and\>\|\<or\>\|\<not\>\%(\s\+\<in\>\)\?/
       \ skipwhite skipempty
       \ contained
       \ nextgroup=@typstExpr
@@ -119,7 +138,7 @@ syntax region typstExprContentBlock
       \ skipwhite
       \ contained
       \ extend
-      \ contains=@typstMarkup,typstExprStart,typstMarkupMath
+      \ contains=@typstMarkup,@typstExprStartAll
       \ nextgroup=@typstExpr
       \ matchgroup=NONE
       \ start=/\[/
@@ -228,13 +247,14 @@ syntax cluster typstExprBareContent
       \ ,typstExprVar
       \ ,typstExprOpSym
       \ ,typstExprOp
+      \ ,typstExprMath
       \ ,@typstComment
 
 syntax region typstExprBareBraces
       \ skipwhite
       \ contained
-      \ contains=@typstExprBareContent,typstMarkupMath
-      \ nextgroup=typstExprBareDot
+      \ contains=@typstExprBareContent
+      \ nextgroup=typstExprBareDot,typstExprBareContentBlock
       \ start=/(/
       \ end=/)/
 
@@ -242,7 +262,7 @@ syntax region typstExprBareContentBlock
       \ skipwhite
       \ contained
       \ extend
-      \ contains=@typstMarkup,typstExprStart,typstMarkupMath
+      \ contains=@typstMarkup,@typstExprStartAll
       \ nextgroup=typstExprBareContentBlock
       \ matchgroup=NONE
       \ start=/\[/
@@ -260,11 +280,6 @@ syntax match typstExprBareNumberType
       \ contained
       \ /\v%(pt|mm|cm|in|em|deg|rad|\%|fr)>?/
 
-syntax region typstMarkupDollar
-      \ matchgroup=typstMarkupDollar start=/\\\@1<!\$/ end=/\\\@1<!\$/
-      \ contains=@typstMath
-
-
 syntax cluster typstMarkup
       \ contains=typstMarkupRawInline
       \ ,typstMarkupRawBlock
@@ -281,7 +296,7 @@ syntax cluster typstMarkup
       \ ,typstMarkupBackslash
       \ ,typstMarkupLinebreak
       \ ,typstMarkupNonbreakingSpace
-      \ ,@typstMarkupDollar
+      \ ,typstMarkupMath
       \ ,typstMarkupShy
       \ ,typstMarkupDash
       \ ,typstMarkupEllipsis
@@ -383,9 +398,22 @@ syntax region typstMarkupMath
       \ matchgroup=typstMarkupDollar start=/\\\@1<!\$/ end=/\\\@1<!\$/
       \ contains=@typstMath
 
+" Same delimiters and body as typstMarkupMath, but for when math is a
+" value inside a code expression (e.g. `let x = $a$ + 1`) rather than
+" free-floating in prose: unlike the plain-prose form, it must chain
+" to a following operator, since e.g. the '+' above is real code, not
+" literal text -- but giving typstMarkupMath itself that nextgroup
+" would wrongly swallow plain text after inline math in markup.
+syntax region typstExprMath
+      \ skipwhite
+      \ contained
+      \ matchgroup=typstMarkupDollar start=/\\\@1<!\$/ end=/\\\@1<!\$/
+      \ contains=@typstMath
+      \ nextgroup=typstExprOp,typstExprOpSym,@typstExpr
+
 " Math
 syntax cluster typstMath
-      \ contains=@typstHashtag
+      \ contains=@typstExprStartAll
       \ ,typstMathVariable
       \ ,typstMathIdentifier
       \ ,typstMathFunction
