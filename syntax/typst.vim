@@ -477,6 +477,14 @@ hi def link typstExprStartLabel Structure
 hi def link typstExprStartConstant Constant
 hi def link typstExprStartCommand Statement
 hi def link typstExprStartFunc Function
+" The bracket-opening variants (#(, #{, #[) tag onto a delimiter that
+" has no color of its own, so matching-the-target would leave them
+" plain -- give them one shared group instead, so they still read as
+" "code starts here" and so a colorscheme only has to override one name.
+hi def link typstExprStartCode typstExprStartGroup
+hi def link typstExprStartContent typstExprStartGroup
+hi def link typstExprStartBraces typstExprStartGroup
+hi def link typstExprStartGroup Special
 hi def link typstExprOp Statement
 hi def link typstExprVar Identifier
 hi def link typstExprBareVar Identifier
